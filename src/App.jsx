@@ -157,7 +157,7 @@ export default function App() {
   const [lang, setLang] = useState('ru');
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/frontend">
       <div style={styles.body}>
         <header style={styles.header}>
           <div style={styles.container}>
