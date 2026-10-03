@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import { embeddedHardwareDatabase, availableCategories, embeddedGamesDatabase } from './data/hardware';
+import { embeddedHardwareDatabase, embeddedGamesDatabase } from './data/hardware';
 import TreeBranch from './components/TreeBranch';
 import HardwareCard from './components/HardwareCard';
 import ProductPage from './components/ProductPage';
@@ -34,21 +34,30 @@ const styles = {
   gameGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px', width: '100%' },
   gameCard: { background: 'rgba(255,255,255,0.01)', border: '1px solid var(--apple-border)', borderRadius: '10px', padding: '16px', cursor: 'pointer' }
 };
+
 function MainShopView({ lang }) {
   const [isRootActive, setIsRootActive] = useState(false);
   const [chosenCat, setChosenCategory] = useState(null);
   const [chosenBrand, setChosenBrand] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  
+
   const [compLeft, setCompLeft] = useState(null);
   const [compRight, setCompRight] = useState(null);
-  
+
   const t = fullRegistry[lang];
+
+  const translatedCategories = [
+    { id: 'processors', name: t.processors || 'processors' },
+    { id: 'videocards', name: t.gpu || 'videocards' },
+    { id: 'ram', name: t.ram || 'ram' },
+    { id: 'storage', name: t.storage || 'storage' },
+    { id: 'motherboard', name: t.motherboard || 'motherboard' },
+    { id: 'cases', name: t.cases || 'cases' }
+  ];
 
   const availableBrands = [...new Set(embeddedHardwareDatabase.filter(p => p.category === chosenCat).map(p => p.brand))];
   const finalHardware = embeddedHardwareDatabase.filter(p => p.category === chosenCat && p.brand === chosenBrand);
-
-  const filteredSuggestions = searchQuery.trim() === '' ? [] : embeddedHardwareDatabase.filter(p => 
+  const filteredSuggestions = searchQuery.trim() === '' ? [] : embeddedHardwareDatabase.filter(p =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.sysId.toLowerCase().includes(searchQuery.toLowerCase())
   ).slice(0, 5);
 
@@ -87,6 +96,7 @@ function MainShopView({ lang }) {
       alert(`⚠️ ${game.name}\n\nОжидается: 35-50 FPS.`);
     }
   };
+
   return (
     <div style={styles.treeContainer}>
       {(compLeft || compRight) && (
@@ -121,7 +131,7 @@ function MainShopView({ lang }) {
       </button>
 
       {isRootActive && (
-        <TreeBranch items={availableCategories} activeId={chosenCat} type="cat" onClick={(id) => { setChosenCategory(id); setChosenBrand(null); }} />
+        <TreeBranch items={translatedCategories} activeId={chosenCat} type="cat" onClick={(id) => { setChosenCategory(id); setChosenBrand(null); }} />
       )}
       {chosenCat && availableBrands.length > 0 && (
         <TreeBranch items={availableBrands} activeId={chosenBrand} onClick={(id) => setChosenBrand(id)} />
@@ -143,7 +153,7 @@ function MainShopView({ lang }) {
           {embeddedGamesDatabase.map(game => (
             <div key={game.id} style={styles.gameCard} onClick={() => handleTestGame(game)}>
               <div style={{fontSize:'13px', fontWeight:'600', color:'var(--apple-text-primary)', marginBottom:'4px'}}>{game.name}</div>
-              <div style={{fontSize:'11.5px', color:'var(--apple-text-secondary)'}}>{game.desc}</div>
+              <div style={{fontSize:'11.5px', color: 'var(--apple-text-secondary)'}}>{game.desc}</div>
             </div>
           ))}
         </div>
